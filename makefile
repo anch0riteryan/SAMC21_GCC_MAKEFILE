@@ -38,7 +38,7 @@ CFLAGS += $(mcu) $(specs)
 CFLAGS += -DDONT_USE_CMSIS_INIT -D__SAMC21J18A__
 CFLAGS += -I$(CMSIS_PATH)/include -I$(CMSIS_PATH)/include/instance -I$(CMSIS_PATH)/include/component #CMSIS INSTANCE
 CFLAGS += -I$(THIRDPARTY_PATH)/Include
-CFLAGS += -Wall -g -gdwarf-4 -O0
+CFLAGS += -Wall -Werror-implicit-function-declaration -g -gdwarf-4 -O0
 CFLAGS += -c -o
 
 LDFLAGS += $(mcu) $(specs)
@@ -46,7 +46,7 @@ LDFLAGS += -DDONT_USE_CMSIS_INIT -D__SAMC21J18A__
 LDFLAGS += -L$(THIRDPARTY_PATH)/Include
 LDFLAGS += -L$(THIRDPARTY_PATH)/Lib/GCC
 LDFLAGS += -lc -lm -lg -lgcc -lrdimon -lnosys
-LDFLAGS += -Wl,--gc-sections -Wl,-Map=./$(APP_NAME).map
+LDFLAGS += -Wl,--gc-sections -Wl,-print-memory-usage -Wl,-Map=./$(APP_NAME).map
 LDFLAGS += -g -gdwarf-4 -O0
 
 # ARM DSP and math
@@ -59,14 +59,6 @@ LDFLAGS += -T$(linker_script)
 
 objs := $(startup_obj) $(obj)
 all: check_obj_path $(APP_NAME).elf
-	@echo ----
-	@echo CMSIS SRC:$(startup_src)
-	@echo CMSIS OBJ:$(startup_obj)
-	@echo USER SRC:$(src)
-	@echo USER OJB:$(obj)
-	@echo DSP SRC:$(arm_dsp_src)
-	@echo DSP OBJ:$(arm_dsp_obj)
-	@echo ----
 
 clean:
 	rm ./obj/* -rf
@@ -75,8 +67,8 @@ clean:
 
 path := $(dir $(objs))
 check_obj_path:
-	@echo check .obj files path ... 
-	mkdir -p $(path)
+	@echo check $(OBJ_PATH) files path ... 
+	@mkdir -p $(path)
 
 # ELF
 $(APP_NAME).elf : $(objs)
